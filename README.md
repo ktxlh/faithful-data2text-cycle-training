@@ -1,6 +1,13 @@
-## Faithful Low-Resource Data-to-Text Generation Through Cycle Training
+## Reproducing Faithful Low-Resource Data-to-Text Generation Through Cycle Training
 
-This repository contains the source code for the ACL 2023 paper: [Faithful Low-Resource Data-to-Text Generation through Cycle Training](https://aclanthology.org/2023.acl-long.160.pdf)
+This repository contains the source code for the ACL 2023 paper: [Faithful Low-Resource Data-to-Text Generation through Cycle Training](https://aclanthology.org/2023.acl-long.160.pdf) extended by an external course project group for reproduction.
+
+## Setup
+Note that the versions in `setup.sh` are for CUDA 11.4. Modify it for your hardware.
+```
+chmod +x setup.sh
+./setup.sh
+```
 
 ## How to Run
 
