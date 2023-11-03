@@ -7,7 +7,7 @@ import torch
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
-device = torch.device('cuda')
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 def try_compute_model(batch_size, max_output_length):
     start = time()
@@ -20,7 +20,6 @@ def try_compute_model(batch_size, max_output_length):
         no_repeat_ngram_size = 0
 
         # NOTE: There will be *2* models on GPU simultaneously (although only one is trained at a time)
-
         model_text2data = T5ForConditionalGeneration.from_pretrained("t5-base")
         model_text2data.config.task_specific_params["summarization"]={
             "early_stopping": True,
@@ -45,22 +44,35 @@ def try_compute_model(batch_size, max_output_length):
         }
         model_data2text.to(device)
 
-        optimizer = torch.optim.AdamW(model_text2data.parameters(), lr=3e-4)
+        optimizer = torch.optim.AdamW(model_data2text.parameters(), lr=3e-4)
         loss_function = torch.nn.CrossEntropyLoss()
+
+        load_duration = time() - start
+        start = time()
 
         vocab_size = model_data2text.encoder.embed_tokens.weight.shape[0]
         input_ids = torch.randint(low=0, high=vocab_size-1, size=(batch_size, max_output_length)).to(device)
 
-        output = model_text2data(input_ids=input_ids, decoder_input_ids=input_ids, labels=input_ids, return_dict=True)
+        with torch.no_grad():
+            model_text2data.eval()
+            output = model_text2data(input_ids=input_ids, decoder_input_ids=input_ids, labels=input_ids, return_dict=True)
+
+        input_ids = torch.randint(low=0, high=vocab_size-1, size=(batch_size, max_output_length)).to(device)
+
+        model_data2text.train()
+        output = model_data2text(input_ids=input_ids, decoder_input_ids=input_ids, labels=input_ids, return_dict=True)
 
         output.loss.backward()
         optimizer.step()
 
-        duration = time() - start
-    except RuntimeError as e:
-        duration = 0
+        step_duration = time() - start
 
-    return (batch_size, max_output_length, duration)
+    except RuntimeError as e:
+        load_duration = 0
+        step_duration = 0
+        print('error', batch_size, max_output_length)
+
+    return (batch_size, max_output_length, load_duration, step_duration)
 
 
 if __name__ == "__main__":
