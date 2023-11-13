@@ -9,6 +9,20 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+## Data Format
+They load datasets with [Huggingface Datasets](https://huggingface.co/docs/datasets/v2.14.5/en/nlp_load).
+
+Both text and triplets (i.e. data) are split into train/val/test with the corressponding filenames:
+* `train.source`: for args `text_file` and `data_file`
+* `val.tsv`: for args `data2text_validation_file` and `text2data_validation_file`
+* `test.tsv`: for args `data2text_test_file` and `text2data_test_file`
+
+`train.source` format: text file; one text instance per line.
+
+`val.tsv` and `test.tsv` formats: **tab**-separated files. Fields:
+- `source`: input text or triplet
+- `target`: target output text or triplets
+
 ## How to Run
 
 ### Usage

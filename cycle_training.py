@@ -52,6 +52,21 @@ import json
 #           '--text2data_test_file','/home/ubuntu/data/webnlg-t5-text2triplets/test.tsv']
 
 
+sys.argv=['--gpu_device','0',
+          '--num_epochs','1',
+          '--output_dir','playground/',
+          '--data2text_model','t5-base',
+          '--text2data_model','t5-base',
+          '--text_file','train.source',
+          '--data_file','train.source',
+          '--do_train','--do_eval','--do_test','--do_generate',
+          '--scorer_model', 'roberta-base',
+          '--data2text_validation_file','val.tsv',
+          '--text2data_validation_file','val.tsv',
+          '--data2text_test_file','test.tsv',
+          '--text2data_test_file','test.tsv']
+
+
 # ## Arguments Processing
 
 
@@ -154,8 +169,8 @@ parser.add_argument('--delta', type=float, default=0.01,
 parser.add_argument('--patience', type=int, default=3,
                     help="Terminate the training after n epochs without any improvement")
 
-# args = parser.parse_args(sys.argv)
-args = parser.parse_args()
+args = parser.parse_args(sys.argv)
+# args = parser.parse_args()
 
 
 
@@ -184,7 +199,7 @@ device = torch.device('cuda:'+str(args.gpu_device)) if torch.cuda.is_available()
 
 
 
-tokenizer = T5Tokenizer.from_pretrained(args.t5_tokenizer)
+tokenizer = T5Tokenizer.from_pretrained(args.t5_tokenizer, model_max_length=512)
 if args.text2data_model != None:
     model_text2data = T5ForConditionalGeneration.from_pretrained(args.text2data_model)
     model_text2data.config.task_specific_params["summarization"]={
@@ -219,7 +234,7 @@ if args.data2text_model != None:
 
 
 if args.scorer_model != None:
-    tokenizer_scorer = RobertaTokenizer.from_pretrained(args.scorer_model_tokenizer)
+    tokenizer_scorer = RobertaTokenizer.from_pretrained(args.scorer_model_tokenizer, model_max_length=512)
     model_scorer = RobertaForSequenceClassification.from_pretrained(args.scorer_model,num_labels=1)
     model_scorer.to(device)
 
