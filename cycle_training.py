@@ -25,17 +25,17 @@ import sys
 import json
 
 sys.argv = ['--gpu_device', '0',
-            '--num_epochs', '1',
+            '--num_epochs', '3',
             '--output_dir', 'playground/',
             '--data2text_model', 't5-base',
             '--text2data_model', 't5-base',
-            '--train_file', 'data/wsql_train.tsv',
+            '--train_file', 'data/e2e_train.tsv',
             '--do_train', '--do_eval', '--do_test', '--do_generate',
             '--scorer_model', 'roberta-base',
-            '--validation_file', 'data/wsql_validation.tsv',
-            '--test_file', 'data/wsql_test.tsv',
-            '--per_gpu_train_batch_size', '8',
-            '--per_gpu_eval_batch_size', '8']
+            '--validation_file', 'data/e2e_validation.tsv',
+            '--test_file', 'data/e2e_test.tsv',
+            '--per_gpu_train_batch_size', '32',
+            '--per_gpu_eval_batch_size', '32']
 
 parser = argparse.ArgumentParser()
 # General
@@ -549,12 +549,12 @@ if args.do_train:
         del model_text2data
 
     if args.do_test:
-        if args.data2text_test_file is not None:
+        if args.test_file is not None:
             model_data2text = T5ForConditionalGeneration.from_pretrained(
                 os.path.join(args.output_dir, 'data2text-best'))
             model_data2text.to(device)
 
-        if args.text2data_test_file is not None:
+        if args.test_file is not None:
             model_text2data = T5ForConditionalGeneration.from_pretrained(
                 os.path.join(args.output_dir, 'text2data-best'))
             model_text2data.to(device)
