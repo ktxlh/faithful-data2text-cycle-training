@@ -30,7 +30,7 @@ def process_split(dataset, file_path, split):
         # Format triplets
         triplet_text = 'Extract Triples: '
         for idx, triplet in enumerate(triplet_set):
-            triplet_text += f'{idx + 1}. [S] {to_normal_string(triplet[0])} ' \
+            triplet_text += f'[S] {to_normal_string(triplet[0])} ' \
                             f'[P] {to_normal_string(triplet[1])} [O] {to_normal_string(triplet[2])} '
 
         if 'e2e' in src:
