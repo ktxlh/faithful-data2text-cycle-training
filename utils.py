@@ -47,6 +47,15 @@ def process_split(dataset, file_path, split):
     wtq_df.to_csv(os.path.join(file_path, f'wtq_{split}.tsv'), sep='\t', index=False)
     wsql_df = pd.DataFrame(wsql_data)
     wsql_df.to_csv(os.path.join(file_path, f'wsql_{split}.tsv'), sep='\t', index=False)
+    
+    # Sample subsets of 100 samples for low-resource training
+    if split == 'train':
+        seeds = [662, 66, 62, 6, 2]
+        for idx, seed in enumerate(seeds):
+            e2e_df.sample(n=100, random_state=seed).to_csv(os.path.join(file_path, f'e2e_{split}_sub{idx}.tsv'), sep='\t', index=False)
+            wtq_df.sample(n=100, random_state=seed).to_csv(os.path.join(file_path, f'wtq_{split}_sub{idx}.tsv'), sep='\t', index=False)
+            wsql_df.sample(n=100, random_state=seed).to_csv(os.path.join(file_path, f'wsql_{split}_sub{idx}.tsv'), sep='\t', index=False)
+    
     print(f"{split} split: e2e: {e2e_df.shape[0]}, wtq: {wtq_df.shape[0]}, wsql: {wsql_df.shape[0]}")
 
 
