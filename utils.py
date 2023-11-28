@@ -2,14 +2,18 @@ import os
 from datasets import load_dataset
 import pandas as pd
 from tqdm import tqdm
+from unidecode import unidecode
 
 
 def to_normal_string(s):
     # Replace underscores with spaces for snake_case
     s = s.replace('_', ' ')
+    
+    # Remove accents
+    s = unidecode(s)
 
     # Insert spaces before capital letters in camelCase (avoiding the first character)
-    return ''.join(' ' + char if char.isupper() and i != 0 else char for i, char in enumerate(s)).strip()
+    return ''.join(' ' + char.lower() if char.isupper() and i != 0 else char for i, char in enumerate(s)).strip()
 
 
 def process_split(dataset, file_path, split):
