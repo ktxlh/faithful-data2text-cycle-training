@@ -28,19 +28,24 @@ tokenizer = AutoTokenizer.from_pretrained("t5-base", model_max_length=256)
 # %%
 def get_dataloader(data_files, batch_size):
     dataset = load_dataset(path="data", data_files=data_files, split="train")
-    tokenized_triplet = dataset.map(
-        lambda sample: tokenizer(sample["triplet"], padding='max_length', truncation=True, max_length=256, return_tensors="pt"), 
-        batched=True,
-    )
-    dataset = dataset.add_column("input_ids", tokenized_triplet["input_ids"])
-    dataset = dataset.add_column("attention_mask", tokenized_triplet["attention_mask"])
+    dataset = dataset.map(lambda sample: {
+        'text': "Extract Triplets: "+sample['text'],
+        'triplet': sample['triplet'].replace("Generate in English: ", ""),
+    })
 
     tokenized_text = dataset.map(
         lambda sample: tokenizer(sample["text"], padding='max_length', truncation=True, max_length=256, return_tensors="pt"), 
         batched=True,
     )
-    tokenized_text["input_ids"][tokenized_text["input_ids"] == 0] = -100
-    dataset = dataset.add_column(f"labels", tokenized_text["input_ids"])
+    dataset = dataset.add_column("input_ids", tokenized_text["input_ids"])
+    dataset = dataset.add_column("attention_mask", tokenized_text["attention_mask"])
+
+    tokenized_triplet = dataset.map(
+        lambda sample: tokenizer(sample["triplet"], padding='max_length', truncation=True, max_length=256, return_tensors="pt"), 
+        batched=True,
+    )
+    tokenized_triplet["input_ids"][tokenized_triplet["input_ids"] == 0] = -100
+    dataset = dataset.add_column(f"labels", tokenized_triplet["input_ids"])
     return DataLoader(dataset, shuffle=True, batch_size=batch_size)
 
 
@@ -144,9 +149,9 @@ def finetune(source, sub):
             best_model = deepcopy(model)
             model.to(device)
 
-        elif epoch - best_epoch == patience:
+        if epoch == best_epoch:
             # Save model
-            torch.save(best_model.state_dict(), f"checkpoints/{source}_{sub}.pt")
+            torch.save(best_model.state_dict(), f"checkpoints-t2d/{source}_{sub}.pt")
 
             # Save results
             results = {
@@ -155,8 +160,10 @@ def finetune(source, sub):
                 'train_losses': train_losses,
                 'val_losses': val_losses,
             }
-            with open(f"results/{source}_{sub}.json", "w") as f:
+            with open(f"results-t2d/{source}_{sub}.json", "w") as f:
                 json.dump(results, f, indent=2)
+
+        if epoch - best_epoch == patience:
             break
 
 
@@ -167,3 +174,4 @@ if __name__ == "__main__":
     #        print("Finetuning", source, sub)
     #        finetune(source, sub)
     finetune("webnlg", 0)
+

@@ -41,6 +41,12 @@ def evaluate(test_dataloader, source, sub):
         decoded_outputs = tokenizer.batch_decode(generated_outputs, skip_special_tokens=True)
         generated_texts += decoded_outputs
 
+        # for t, g in zip(batch["triplet"], decoded_outputs):
+        #     print(t)
+        #     print(g)
+        #     print()
+        #     break ###
+
     return total_loss, source_triplets, generated_texts, target_texts
 
 
@@ -113,10 +119,14 @@ if __name__ == "__main__":
 
     sources = ['e2e', 'wsql', 'wtq', 'webnlg']
     sub_range = 5
-    batch_size = 4
+    batch_size = 32
     for source in sources:
         test_dataloader = get_dataloader(f"{source}_test.tsv", batch_size)
         for sub in range(sub_range):
             print("Evaluating", source, sub)
             total_loss, source_triplets, generated_texts, target_texts = evaluate(test_dataloader, source, sub)
             results = update_results(total_loss, source_triplets, generated_texts, target_texts)
+            # with open(f"generations/{source}_{sub}.txt", "w") as f:
+            #     f.write("\n".join(generated_texts) + "\n")
+        #     break ###
+        # break ###c
