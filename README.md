@@ -10,7 +10,7 @@ chmod +x setup.sh
 ```
 
 ## Data Format
-They load datasets with [Huggingface Datasets](https://huggingface.co/docs/datasets/v2.14.5/en/nlp_load).
+Load datasets with [Huggingface Datasets](https://huggingface.co/docs/datasets/v2.14.5/en/nlp_load).
 
 Both text and triplets (i.e. data) are split into train/val/test with the corressponding filenames:
 * `train.source`: for args `text_file` and `data_file`
