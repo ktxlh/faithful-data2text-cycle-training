@@ -9,9 +9,28 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-## Data Format
-Load datasets with [Huggingface Datasets](https://huggingface.co/docs/datasets/v2.14.5/en/nlp_load).
+## Dependencies
+All dependencies are listed in `requirements.txt`. Create a conda environment using:
+```
+$ conda create --name <env> --file requirements.txt
+```
 
+## Data download instruction
+Download `csv` and data splits from Huggingface.
+* WebNLG: https://huggingface.co/datasets/web_nlg
+* DART: https://huggingface.co/datasets/GEM/dart
+* XAlign: https://huggingface.co/datasets/tushar117/xalign/viewer/en
+
+## Data format
+### Preprocessing code and command
+Preprocessing code can be run with `python <filename>` under conda environment.
+- WebNLG: `python webnlg.py`
+- DART: `python dart.py`
+- XAlign: `python utils.py`
+
+
+### Custom dataset
+To convert your own datasets into the required format, follow these instructions.
 Both text and triplets (i.e. data) are split into train/val/test with the corressponding filenames:
 * `train.source`: for args `text_file` and `data_file`
 * `val.tsv`: for args `data2text_validation_file` and `text2data_validation_file`
@@ -23,9 +42,16 @@ Both text and triplets (i.e. data) are split into train/val/test with the corres
 - `source`: input text or triplet
 - `target`: target output text or triplets
 
+Then, load datasets with [Huggingface Datasets](https://huggingface.co/docs/datasets/v2.14.5/en/nlp_load).
+
 ## How to Run
 
-### Usage
+### Fine-tuning
+```
+python finetune.py
+```
+
+### Cycle training
 
 ```
 python cycle_training.py [-h] [--config_file CONFIG_FILE]
@@ -155,11 +181,13 @@ python cycle_training.py [-h] [--config_file CONFIG_FILE]
   
 ```
 
-## Security
+## Evaluate
+```
+python evaluate.py
+```
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+## Pre-trained models
+All pretrained model checkpoints are loaded from HuggingFace and included in the above scripts.
 
-## License
-
-This project is licensed under the Apache-2.0 License.
-
+## Table of results
+<img width="657" alt="image" src="https://github.com/ktxlh/faithful-data2text-cycle-training/assets/32475254/46c90f25-297a-4790-bbc2-061fbd43a751">
